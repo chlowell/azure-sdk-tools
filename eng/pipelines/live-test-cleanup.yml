@@ -23,6 +23,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureCloud - Resource Cleanup
@@ -34,6 +35,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureCloud-Preview - Resource Cleanup
@@ -45,6 +47,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureUSGovernment - Resource Cleanup
@@ -56,6 +59,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureChinaCloud - Resource Cleanup
@@ -67,6 +71,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: Dogfood Translation - Resource Cleanup
@@ -78,6 +83,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: Dogfood ACS - Resource Cleanup
@@ -94,6 +100,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureCloud ACS - Resource Cleanup
@@ -110,6 +117,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureCloud Cosmos - Resource Cleanup
@@ -126,6 +134,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureCloud Storage NET - Resource Cleanup
@@ -138,6 +147,7 @@ stages:
           '@ | ConvertFrom-Json -AsHashtable
 
           ./eng/scripts/live-test-resource-cleanup.ps1 `
+          -WhatIf `
           @subscriptionConfiguration `
           -Verbose
         displayName: AzureCloud Playground - Resource Cleanup
