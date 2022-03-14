@@ -9,7 +9,7 @@ from ._node_index import NodeIndex
 from ._token import Token
 from ._token_kind import TokenKind
 from ._version import VERSION
-from ._diagnostic import Diagnostic
+from ._diagnostic import Diagnostic, DiagnosticLevel
 from ._metadata_map import MetadataMap
 
 JSON_FIELDS = ["Name", "Version", "VersionString", "Navigation", "Tokens", "Diagnostics", "PackageName", "Language"]
@@ -161,8 +161,9 @@ class ApiView:
             # If type name is importable then it's a valid type name. Source link wont be available if type is from 
             # different package
             if not is_valid_type_name(type_full_name):
+                from apistub import DiagnosticLevel
                 # Navigation ID is missing for internal type, add diagnostic error
-                self.add_diagnostic(code="missing-source-link", text=SOURCE_LINK_NOT_AVAILABLE.format(token.value), target_id=line_id)            
+                self.add_diagnostic(node=self, code="missing-source-link", text=SOURCE_LINK_NOT_AVAILABLE.format(token.value), target_id=line_id, level=DiagnosticLevel.WARNING)
         self.add_token(token)
 
 
@@ -189,8 +190,15 @@ class ApiView:
             self.add_punctuation(type_name)        
 
 
-    def add_diagnostic(self, *, code, text, target_id):
-        self.diagnostics.append(Diagnostic(code=code, target_id=target_id, message=text))
+    def add_diagnostic(self, *, node, code, text, target_id, level):
+        from .nodes._base_node import NodeEntityBase
+        if not isinstance(node, NodeEntityBase):
+            raise TypeError(f"Expected NodeEntityBase. Found '{type(node)}'")
+        if code not in node.suppressions:
+            self.diagnostics.append(Diagnostic(code=code, target_id=target_id, message=text, level=level))
+        else:
+            message = f"**SUPPRESSED** {text}"
+            self.diagnostics.append(Diagnostic(code=code, target_id=target_id, message=message, level=DiagnosticLevel.INFO))
 
 
     def add_member(self, name, id):
