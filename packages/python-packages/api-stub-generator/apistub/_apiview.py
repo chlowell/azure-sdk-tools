@@ -1,3 +1,4 @@
+from dis import dis
 from json import JSONEncoder
 import logging
 import re
@@ -163,7 +164,7 @@ class ApiView:
             if not is_valid_type_name(type_full_name):
                 from apistub import DiagnosticLevel
                 # Navigation ID is missing for internal type, add diagnostic error
-                self.add_diagnostic(node=self, code="missing-source-link", text=SOURCE_LINK_NOT_AVAILABLE.format(token.value), target_id=line_id, level=DiagnosticLevel.WARNING)
+                self.add_diagnostic(node=self, code="missing-source-link", text=SOURCE_LINK_NOT_AVAILABLE.format(token.value), target_id=line_id, level=DiagnosticLevel.ERROR)
         self.add_token(token)
 
 
@@ -217,6 +218,36 @@ class ApiView:
 
     def add_navigation(self, navigation):
         self.navigation.append(navigation)
+
+    def report_errors(self, stub_generator) -> int:
+        errors = []
+        warnings = []
+        # sort errors and warnings. Ignore suppressed items.
+        for diagnostic in self.diagnostics:
+            if diagnostic.level == DiagnosticLevel.ERROR:
+                errors.append(diagnostic)
+            elif diagnostic.level == DiagnosticLevel.WARNING:
+                warnings.append(diagnostic)
+
+        if not (warnings or errors):
+            logging.info("*************** Completed token generation. No errors or warnings. ***************")
+            return 0
+
+
+        if not stub_generator.hide_report:
+            if warnings:
+                logging.info("************************** APIVIEW WARNINGS **************************")
+                [x.log(logging.info) for x in warnings]
+            if errors:
+                logging.info("************************** APIVIEW ERRORS **************************")
+                [x.log(logging.info) for x in errors]
+
+            # for module in stub_generator.module_dict.values():
+            #     module.print_errors()
+
+        logging.info(f"*************** Completed token generation. {len(warnings)} warnings. {len(errors)} errors. ***************")
+        return len(errors)
+
 
 class APIViewEncoder(JSONEncoder):
     """Encoder to generate json for APIview object

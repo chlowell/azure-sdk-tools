@@ -7,6 +7,8 @@
 # --------------------------------------------------------------------------
 
 from azure.core import CaseInsensitiveEnumMeta
+from azure.core.tracing.decorator import distributed_trace
+
 from dataclasses import dataclass
 from enum import Enum, EnumMeta
 from six import with_metaclass
@@ -158,5 +160,34 @@ class SomePoorlyNamedObject:
 class ObjectWithSuppressions:
 
     # apiview: disable=missing-kwargs
-    def get(self):
-        pass
+    @distributed_trace
+    def get(self, name):
+        return name
+
+    @distributed_trace
+    def mismatch_types(self, val, **kwargs):
+        # type: (str) -> int
+        """ A test of mismatched types.
+        
+        :param int val: A mismatch val.
+        :rtype: bool
+        """
+        return 0
+
+    @distributed_trace
+    def list_bad_return(self, **kwargs):
+        # type: (...) -> List[str]
+        """
+        :rtype: List[str]
+        """
+        return [""]
+
+    @distributed_trace
+    def bad_source_line(self, obj, **kwargs):
+        # (~some.bad.link) -> str
+        """ Testing bad source link.
+        
+        :param obj: An obj
+        :type obj: ~some.bad.link
+        """
+        return ""

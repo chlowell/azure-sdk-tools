@@ -5,15 +5,15 @@ _HELP_URL_STRING = "https://github.com/Azure/azure-sdk-tools/blob/main/doc/pytho
 
 
 _supported_diagnostic_codes = {
-    "missing-type",
-    "missing-source-link",
-    "missing-kwargs",
-    "name-mismatch",
-    "decorator-parse",
-    "missing-return-type",
-    "missing-typehint",
-    "return-type-mismatch",
-    "list-return-type"
+    "missing-type",         # yes
+    "missing-source-link",  # ??
+    "missing-kwargs",       # yes
+    "name-mismatch",        # yes
+    "decorator-parse",      # ??
+    "missing-return-type",  # ??
+    "missing-typehint",     # ??
+    "return-type-mismatch", # yes
+    "list-return-type"      # yes
 }
 
 
@@ -22,6 +22,16 @@ class DiagnosticLevel(int, Enum):
     INFO = 1
     WARNING = 2
     ERROR = 3
+
+    def __str__(self):
+        if self == 0:
+            return "DEFAULT"
+        elif self == 1:
+            return "INFO"
+        elif self == 2:
+            return "WARNING"
+        elif self == 3:
+            return "ERROR"
 
 
 class Diagnostic:
@@ -36,3 +46,6 @@ class Diagnostic:
         self.help_link_uri = _HELP_URL_STRING.format(code)
         self.target_id = target_id
         self.level = level
+
+    def log(self, log_func):
+        log_func(f"{str(self.level)}: {self.target_id}: {self.text}")

@@ -35,4 +35,8 @@ def console_entry_point():
     with open(out_file_path, "w") as json_file:
         json_file.write(json_tokens)
 
+    # fail the run if any errors are found
+    err_count = apiview.report_errors(stub_generator)
+    ret_code = 1 if err_count else 0
+    return ret_code
 
