@@ -42,6 +42,7 @@ class Diagnostic:
             raise ValueError(f"APIView found unexpected code '{code}'.")
         self.diagnostic_id = "AZ_PY_{}".format(Diagnostic.id_counter)
         Diagnostic.id_counter += 1
+        self._code = code
         self.text = f"[{code}] {message}"
         self.help_link_uri = _HELP_URL_STRING.format(code)
         self.target_id = target_id

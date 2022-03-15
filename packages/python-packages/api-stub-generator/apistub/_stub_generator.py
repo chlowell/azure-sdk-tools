@@ -6,6 +6,8 @@
 # --------------------------------------------------------------------------------------------
 
 import glob
+import json
+import re
 import sys
 import os
 import argparse
@@ -20,14 +22,13 @@ import tempfile
 from subprocess import check_call
 import zipfile
 
-
 from apistub._apiview import ApiView, APIViewEncoder, Navigation, Kind, NavigationTag
 from apistub._metadata_map import MetadataMap
 
 INIT_PY_FILE = "__init__.py"
 TOP_LEVEL_WHEEL_FILE = "top_level.txt"
 
-logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.ERROR)
 
 
 class StubGenerator:
@@ -74,6 +75,12 @@ class StubGenerator:
                 "--source-url",
                 help=("URL to the pull request URL that contains the source used to generate this APIView.")
             )
+            parser.add_argument(
+                "--error-report",
+                help=("Generates API view error reports for the entire Python SDK repo."),
+                action="store_true",
+                default=False,
+            )
             args = parser.parse_args()
 
         if not os.path.exists(args.pkg_path):
@@ -90,6 +97,7 @@ class StubGenerator:
         self.mapping_path = args.mapping_path
         self.hide_report = args.hide_report
         self.filter_namespace = args.filter_namespace or ''
+        self.error_report = args.error_report
         if args.verbose:
             logging.getLogger().setLevel(logging.DEBUG)
 
@@ -233,6 +241,38 @@ class StubGenerator:
             root_module_name = top_lvl_file.readline().strip()
             logging.info("Root module found in {0}: '{1}'".format(TOP_LEVEL_WHEEL_FILE, root_module_name))
             return root_module_name
+
+    def generate_error_report(self):
+        pkg_path = self.pkg_path
+        setup_files = glob.glob(os.path.join(pkg_path, "**", "**", "setup.py"))
+        failed_packages = []
+        regex = re.compile(r"sdk\\([a-zA-Z0-9-]+)\\([a-zA-Z0-9-]+)\\setup.py")
+        results = {}
+        for path in setup_files:
+            (service, package) = regex.findall(path)[0]
+            # skip management libraries
+            if "mgmt" in package:
+                continue
+            print(f"Analyzing: {service} {package}")
+            if service not in results:
+                results[service] = {}
+            if package not in results[service]:
+                results[service][package] = {}
+            self.pkg_path = os.path.dirname(path)
+            try:
+                apiview = self.generate_tokens()
+                diagnostics = apiview.diagnostics
+                for d in diagnostics:
+                    if d._code not in results[service][package]:
+                        results[service][package][d._code] = 1
+                    else:
+                        results[service][package][d._code] += 1
+            except:
+                print(f"Error analyzing: {service} {package}")
+                failed_packages.append(f"{service} - {package}")
+        with open("error_report.json", "w+") as dump_file:
+            dump_file.write(json.dumps(results, sort_keys=True, indent=4))
+        return 0
 
     def _parse_pkg_name(self):
         file_name = os.path.basename(self.pkg_path)

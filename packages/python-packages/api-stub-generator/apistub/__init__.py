@@ -23,6 +23,10 @@ __all__ = [
 
 def console_entry_point():
     stub_generator = StubGenerator()
+
+    if stub_generator.error_report:
+        return stub_generator.generate_error_report()
+
     apiview = stub_generator.generate_tokens()
     json_tokens = stub_generator.serialize(apiview)
     # Write to JSON file
