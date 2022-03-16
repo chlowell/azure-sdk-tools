@@ -4,17 +4,6 @@ from enum import Enum
 _HELP_URL_STRING = "https://github.com/Azure/azure-sdk-tools/blob/main/doc/python_apiview_errors.md#{0}"
 
 
-_supported_diagnostic_codes = {
-    "missing-type",         # yes
-    "missing-source-link",  # ??
-    "missing-kwargs",       # yes
-    "name-mismatch",        # yes
-    "decorator-parse",      # ??
-    "missing-return-type",  # ??
-    "missing-typehint",     # ??
-    "return-type-mismatch", # yes
-    "list-return-type"      # yes
-}
 
 
 class DiagnosticLevel(int, Enum):
@@ -37,8 +26,20 @@ class DiagnosticLevel(int, Enum):
 class Diagnostic:
     id_counter = 1
 
+    SUPPORTED_DIAGNOSTIC_CODES = {
+        "missing-type",
+        "missing-source-link",
+        "missing-kwargs",
+        "name-mismatch",
+        "decorator-parse",
+        "missing-return-type",
+        "missing-typehint",
+        "return-type-mismatch",
+        "list-return-type"
+    }
+
     def __init__(self, *, code, target_id, message, level):
-        if code not in _supported_diagnostic_codes:
+        if code not in Diagnostic.SUPPORTED_DIAGNOSTIC_CODES:
             raise ValueError(f"APIView found unexpected code '{code}'.")
         self.diagnostic_id = "AZ_PY_{}".format(Diagnostic.id_counter)
         Diagnostic.id_counter += 1

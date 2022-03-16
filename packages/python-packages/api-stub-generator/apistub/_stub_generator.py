@@ -24,6 +24,7 @@ import zipfile
 
 from apistub._apiview import ApiView, APIViewEncoder, Navigation, Kind, NavigationTag
 from apistub._metadata_map import MetadataMap
+from apistub._diagnostic import Diagnostic
 
 INIT_PY_FILE = "__init__.py"
 TOP_LEVEL_WHEEL_FILE = "top_level.txt"
@@ -247,7 +248,7 @@ class StubGenerator:
         setup_files = glob.glob(os.path.join(pkg_path, "**", "**", "setup.py"))
         failed_packages = []
         regex = re.compile(r"sdk\\([a-zA-Z0-9-]+)\\([a-zA-Z0-9-]+)\\setup.py")
-        results = {}
+        results = {"ALL": {"TOTAL": {x: 0 for x in Diagnostic.SUPPORTED_DIAGNOSTIC_CODES}}}
         for path in setup_files:
             (service, package) = regex.findall(path)[0]
             # skip management libraries
@@ -263,10 +264,13 @@ class StubGenerator:
                 apiview = self.generate_tokens()
                 diagnostics = apiview.diagnostics
                 for d in diagnostics:
-                    if d._code not in results[service][package]:
-                        results[service][package][d._code] = 1
+                    code = d._code
+                    if code not in results[service][package]:
+                        results[service][package][code] = 1
                     else:
-                        results[service][package][d._code] += 1
+                        results[service][package][code] += 1
+                    # also tally in total
+                    results["ALL"]["TOTAL"][code] += 1
             except:
                 print(f"Error analyzing: {service} {package}")
                 failed_packages.append(f"{service} - {package}")
