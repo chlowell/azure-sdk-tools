@@ -4,9 +4,9 @@ import inspect
 SPECIAL_DEFAULT_VALUES = ["None", "..."]
 
 # Lint warnings
-TYPE_NOT_AVAILABLE = "Type is not available for {0}"
+TYPE_NOT_AVAILABLE = "Type is not available for '{0}'"
 
-TYPE_NOT_REQUIRED = ["**kwargs", "self", "cls", "*", ]
+TYPE_NOT_REQUIRED = ["**kwargs", "*args", "self", "cls", "*"]
 
 class ArgType:
     """Represents Argument type
@@ -54,9 +54,9 @@ class ArgType:
         elif self.argname not in (TYPE_NOT_REQUIRED):
             # Type is not available. Add lint error in review
             error_msg = TYPE_NOT_AVAILABLE.format(self.argname)
-            apiview.add_diagnostic(error_msg, self.id)
+            apiview.add_diagnostic(code="missing-type", text=error_msg, target_id=self.id)
             if self.function_node:
-                self.function_node.add_error(error_msg)
+                self.function_node.add_error(code="missing-type", text=error_msg)
 
         # add arg default value
         if self.default:

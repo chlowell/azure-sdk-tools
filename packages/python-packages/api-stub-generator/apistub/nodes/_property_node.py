@@ -40,7 +40,7 @@ class PropertyNode(NodeEntityBase):
                     if not self.type:
                         self.type = docstring_parser.ret_type
                 except:
-                    self.errors.append("Failed to find type of property {}".format(self.name))
+                    self.errors.append(("missing-type", f"Failed to find type of property '{self.name}'"))
 
         self.display_name = "{0}: {1}".format(self.name, self.type)
         if self.read_only:

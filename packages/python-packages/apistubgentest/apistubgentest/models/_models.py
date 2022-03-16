@@ -153,3 +153,10 @@ class SomePoorlyNamedObject:
 
     def __init__(self, name: str):
         self.name = name
+
+
+class ObjectWithSuppressions:
+
+    # apiview: disable=missing-kwargs
+    def get(self):
+        pass

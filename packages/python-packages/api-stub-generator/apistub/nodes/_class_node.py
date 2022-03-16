@@ -254,7 +254,7 @@ class ClassNode(NodeEntityBase):
         apiview.add_keyword("class", False, True)
         apiview.add_text(self.namespace_id, self.full_name, add_cross_language_id=True)
         if self._name != self.name:
-            apiview.add_diagnostic(f"Alias '{self.name}' does not match __name__ '{self._name}'.", self.namespace_id)
+            apiview.add_diagnostic(code="name-mismatch", text=f"Model '{self.name}' does not match __name__ '{self._name}'.", target_id=self.namespace_id)
 
         # Add inherited base classes
         if self.base_class_names:

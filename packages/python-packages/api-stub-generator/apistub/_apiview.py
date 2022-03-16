@@ -162,7 +162,7 @@ class ApiView:
             # different package
             if not is_valid_type_name(type_full_name):
                 # Navigation ID is missing for internal type, add diagnostic error
-                self.add_diagnostic(SOURCE_LINK_NOT_AVAILABLE.format(token.value), line_id)            
+                self.add_diagnostic(code="missing-source-link", text=SOURCE_LINK_NOT_AVAILABLE.format(token.value), target_id=line_id)            
         self.add_token(token)
 
 
@@ -189,8 +189,8 @@ class ApiView:
             self.add_punctuation(type_name)        
 
 
-    def add_diagnostic(self, text, line_id):
-        self.diagnostics.append(Diagnostic(line_id, text))
+    def add_diagnostic(self, *, code, text, target_id):
+        self.diagnostics.append(Diagnostic(code=code, target_id=target_id, message=text))
 
 
     def add_member(self, name, id):
