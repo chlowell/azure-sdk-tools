@@ -9,6 +9,7 @@ from ._enum_node import EnumNode
 from ._key_node import KeyNode
 from ._property_node import PropertyNode
 from ._docstring_parser import DocstringParser
+from ._pylint_parser import PylintParser
 from ._variable_node import VariableNode
 
 
@@ -137,6 +138,8 @@ class ClassNode(NodeEntityBase):
     def _inspect(self):
         # Inspect current class and it's members recursively
         logging.debug("Inspecting class {}".format(self.full_name))
+        pylint_items = PylintParser.get_items(self.obj)
+
         # get base classes
         self.base_class_names = self._get_base_classes()
         # Check if Enum is in Base class hierarchy
