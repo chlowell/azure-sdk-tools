@@ -35,6 +35,8 @@ class VariableNode(NodeEntityBase):
                 else apiview.add_literal
             )
             add_value(self.value)
+        for err in self.pylint_errors:
+            err.generate_tokens(apiview, self.namespace_id)
 
 
     def print_errors(self):

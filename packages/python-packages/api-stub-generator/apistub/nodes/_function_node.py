@@ -345,6 +345,9 @@ class FunctionNode(NodeEntityBase):
             apiview.add_type(self.return_type)
         apiview.add_newline()
 
+        for err in self.pylint_errors:
+            err.generate_tokens(apiview, self.namespace_id)
+
         if self.errors:
             for e in self.errors:
                 apiview.add_diagnostic(e, self.namespace_id)

@@ -61,6 +61,8 @@ class PropertyNode(NodeEntityBase):
         if self.read_only:
             apiview.add_whitespace()
             apiview.add_literal("# Read-only")
+        for err in self.pylint_errors:
+            err.generate_tokens(apiview, self.namespace_id)
 
 
     def print_errors(self):
