@@ -348,11 +348,6 @@ class FunctionNode(NodeEntityBase):
         for err in self.pylint_errors:
             err.generate_tokens(apiview, self.namespace_id)
 
-        if self.errors:
-            for e in self.errors:
-                apiview.add_diagnostic(e, self.namespace_id)
-
-
     def add_error(self, error_msg):
         # Ignore errors for lint check excluded methods
         if self.name in LINT_EXCLUSION_METHODS:
@@ -362,7 +357,6 @@ class FunctionNode(NodeEntityBase):
         # These are well known protocol implementation
         if not self.name.startswith("_") or self.name in VALIDATION_REQUIRED_DUNDER:
             self.errors.append(error_msg)
-
 
     def _validate_pageable_api(self):
         # If api name starts with "list" and if annotated with "@distributed_trace"

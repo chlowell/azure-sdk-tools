@@ -7,6 +7,7 @@ from typing import List
 class PylintError:
 
     def __init__(self, pkg_name, **kwargs):
+        from apistub import DiagnosticLevel
         self.type = kwargs.pop('type', None)
         self.module = kwargs.pop('module', None)
         self.obj = kwargs.pop('obj', None)
@@ -21,15 +22,15 @@ class PylintError:
         if self.path.startswith(pkg_name):
             self.path = self.path[(len(f"{pkg_name}\\\\") - 1):]
         code = self.symbol[0]
-        self.level = "ERROR" if code in "EF" else "WARNING"
+        self.level = DiagnosticLevel.ERROR if code in "EF" else DiagnosticLevel.WARNING
 
-    def generate_tokens(self, apiview, line_id):
-        text = f"{self.message} [{self.symbol}]"
-        apiview.add_diagnostic(text, line_id)
+    def generate_tokens(self, apiview, target_id):
+        apiview.add_diagnostic(symbol=self.symbol, target_id=target_id, message=self.message, level=self.level)
 
 
 class PylintParser:
 
+    # TODO: Wire this up!
     ALLOWED_PYLINT_SYMBOLS = {
         "connection-string-should-not-be-constructor-param",
         "missing-client-constructor-parameter-credential",
@@ -53,7 +54,9 @@ class PylintParser:
     @classmethod
     def parse(cls, path):
         pkg_name = os.path.split(path)[-1]
-        (pylint_stdout, _) = epylint.py_run(f"{path} -f json", return_std=True)
+        sep = os.path.sep
+        rcfile_path = f"D:{sep}repos{sep}azure-sdk-for-python{sep}pylintrc"
+        (pylint_stdout, _) = epylint.py_run(f"{path} -f json --rcfile {rcfile_path}", return_std=True)
         # strip put stray, non-json lines from stdout
         stdout_lines = [x for x in pylint_stdout.readlines() if not x.startswith("Exception")]
         json_items = json.loads("".join(stdout_lines))

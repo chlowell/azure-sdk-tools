@@ -150,6 +150,13 @@ class ObjectWithDefaults:
         self.is_awesome = is_awesome
         self.pet = pet
 
+
+class ObjectWithCustomPylintViolations:
+
+    def too_many_pos_args(self, a, b, c, d, e, f, g, h):
+        pass
+
+
 class SomePoorlyNamedObject:
 
     def __init__(self, name: str):
