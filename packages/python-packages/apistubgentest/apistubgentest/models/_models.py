@@ -6,11 +6,12 @@
 # Changes may cause incorrect behavior and will be lost if the code is regenerated.
 # --------------------------------------------------------------------------
 
-from azure.core import CaseInsensitiveEnumMeta
 from dataclasses import dataclass
 from enum import Enum, EnumMeta
-from six import with_metaclass
 from typing import Any, TypedDict, Union
+from six import with_metaclass
+
+from azure.core import CaseInsensitiveEnumMeta
 
 
 class PublicCaseInsensitiveEnumMeta(EnumMeta):
