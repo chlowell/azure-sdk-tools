@@ -30,6 +30,7 @@ steps:
         -OpensourceApiApplicationTenant $(opensource-aad-tenant-id) `
         -GithubAliasCachePath ${{ parameters.GithubAliasCachePath }} `
         @subscriptionConfiguration `
+        -WhatIf `
         -Verbose ${{ parameters.AdditionalParameters }}
     displayName: ${{ parameters.DisplayName }}
     continueOnError: true
