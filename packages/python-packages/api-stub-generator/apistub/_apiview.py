@@ -182,8 +182,8 @@ class ApiView:
             self.add_punctuation(type_name)        
 
 
-    def add_diagnostic(self, *, symbol, target_id, message, level):
-        self.diagnostics.append(Diagnostic(symbol=symbol, target_id=target_id, message=message, level=level))
+    def add_diagnostic(self, *, obj, target_id):
+        self.diagnostics.append(Diagnostic(obj=obj, target_id=target_id))
 
 
     def add_member(self, name, id):

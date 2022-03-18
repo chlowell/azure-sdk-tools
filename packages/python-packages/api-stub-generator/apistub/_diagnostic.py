@@ -1,8 +1,5 @@
 from enum import Enum
 
-_HELP_URL_STRING = "https://github.com/Azure/azure-sdk-tools/blob/main/doc/python_apiview_errors.md#{0}"
-
-
 class DiagnosticLevel(int, Enum):
     DEFAULT = 0
     INFO = 1
@@ -23,13 +20,13 @@ class DiagnosticLevel(int, Enum):
 class Diagnostic:
     id_counter = 1
 
-    def __init__(self, *, symbol: str, target_id: str, message: str, level: DiagnosticLevel):
+    def __init__(self, *, obj: "PylintError", target_id: str):
         self.diagnostic_id = "AZ_PY_{}".format(Diagnostic.id_counter)
         Diagnostic.id_counter += 1
-        self.text = f"{message} [{symbol}]"
-        self.help_link_uri = _HELP_URL_STRING.format(symbol)
+        self.text = f"{obj.message} [{obj.symbol}]"
+        self.help_link_uri = obj.help_link
         self.target_id = target_id
-        self.level = level
+        self.level = obj.level
 
     def log(self, log_func):
         log_func(f"{str(self.level)}: {self.target_id}: {self.text}")

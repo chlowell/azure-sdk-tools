@@ -2,7 +2,10 @@ import inspect
 import json
 import os
 from pylint import epylint
+import re
 from typing import List
+
+_HELP_LINK_REGEX = re.compile(r"(.+) See details: *([^\s]+)")
 
 class PylintError:
 
@@ -19,18 +22,29 @@ class PylintError:
         self.symbol = kwargs.pop('symbol', None)
         self.message = kwargs.pop('message', None)
         self.message_id = kwargs.pop('message-id', None)
+        self.help_link = None
         if self.path.startswith(pkg_name):
             self.path = self.path[(len(f"{pkg_name}\\\\") - 1):]
         code = self.symbol[0]
         self.level = DiagnosticLevel.ERROR if code in "EF" else DiagnosticLevel.WARNING
+        self._parse_help_link()
+
+    def _parse_help_link(self):
+        try:
+            (message, help_link) = _HELP_LINK_REGEX.findall(self.message)[0]
+            self.message = message
+            self.help_link = help_link
+        except Exception as err:
+            # if unable to parse, leave alone
+            return
+        
 
     def generate_tokens(self, apiview, target_id):
-        apiview.add_diagnostic(symbol=self.symbol, target_id=target_id, message=self.message, level=self.level)
+        apiview.add_diagnostic(obj=self, target_id=target_id)
 
 
 class PylintParser:
 
-    # TODO: Wire this up!
     ALLOWED_PYLINT_SYMBOLS = {
         "connection-string-should-not-be-constructor-param",
         "missing-client-constructor-parameter-credential",
@@ -55,12 +69,14 @@ class PylintParser:
     def parse(cls, path):
         pkg_name = os.path.split(path)[-1]
         sep = os.path.sep
-        rcfile_path = f"D:{sep}repos{sep}azure-sdk-for-python{sep}pylintrc"
-        (pylint_stdout, _) = epylint.py_run(f"{path} -f json --rcfile {rcfile_path}", return_std=True)
+        # FIXME: This needs to not be hardcoded. Obviously.
+        rcfile_path = f"F:{sep}repos{sep}azure-sdk-for-python{sep}pylintrc"
+        (pylint_stdout, pylint_stderr) = epylint.py_run(f"{path} -f json --rcfile {rcfile_path}", return_std=True)
+        stderr_str = pylint_stderr.read()
         # strip put stray, non-json lines from stdout
         stdout_lines = [x for x in pylint_stdout.readlines() if not x.startswith("Exception")]
         json_items = json.loads("".join(stdout_lines))
-        cls.items = [PylintError(pkg_name, **x) for x in json_items]
+        cls.items = [PylintError(pkg_name, **x) for x in json_items if x["symbol"] in cls.ALLOWED_PYLINT_SYMBOLS]
 
     @classmethod
     def get_items(cls, obj) -> List[PylintError]:
