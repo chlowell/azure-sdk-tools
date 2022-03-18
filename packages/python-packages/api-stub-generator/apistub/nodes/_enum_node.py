@@ -30,9 +30,3 @@ class EnumNode(NodeEntityBase):
             apiview.add_literal(str(self.value))
         for err in self.pylint_errors:
             err.generate_tokens(apiview, self.namespace_id)
-
-    def print_errors(self):
-        if self.errors:
-            print("enum: {}".format(self.name))
-            for e in self.errors:
-                print("    {}".format(e))

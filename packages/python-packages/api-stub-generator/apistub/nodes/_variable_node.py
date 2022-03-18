@@ -37,10 +37,3 @@ class VariableNode(NodeEntityBase):
             add_value(self.value)
         for err in self.pylint_errors:
             err.generate_tokens(apiview, self.namespace_id)
-
-
-    def print_errors(self):
-        if self.errors:
-            print("{0}: {1}".format("ivar" if self.is_ivar else "cvar", self.name))
-            for e in self.errors:
-                print("    {}".format(e))

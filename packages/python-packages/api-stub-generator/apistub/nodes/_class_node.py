@@ -57,7 +57,6 @@ class ClassNode(NodeEntityBase):
     def __init__(self, *, name, namespace, parent_node, obj, pkg_root_namespace):
         super().__init__(namespace, parent_node, obj)
         self.base_class_names = []
-        self.errors = []
         # This is the name obtained by NodeEntityBase from __name__.
         # We must preserve it to detect the mismatch and issue a warning.
         self._name = self.name
@@ -301,17 +300,3 @@ class ClassNode(NodeEntityBase):
             # Add punctuation between types
             if index < list_len - 1:
                 apiview.add_punctuation(",", False, True)
-
-
-    def print_errors(self):
-        has_error = False
-        # Check if atleast one error is present in child nodes
-        for c in self.child_nodes:
-            if hasattr(c, "errors") and c.errors:
-                has_error = True
-                break
-        if has_error:
-            print("-"*150)
-            print("class {}".format(self.full_name))
-            for c in self.child_nodes:
-                c.print_errors()

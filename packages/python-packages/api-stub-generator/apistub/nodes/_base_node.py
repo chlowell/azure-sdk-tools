@@ -27,7 +27,6 @@ class NodeEntityBase:
         self.display_name = self.name
         self.child_nodes = []
         self.pylint_errors = PylintParser.get_items(obj)
-        self.errors = []
 
     def generate_id(self):
         """Generates ID for current object using parent object's ID and name
