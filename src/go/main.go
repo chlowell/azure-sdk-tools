@@ -3,7 +3,7 @@
 
 package main
 
-import "apiviewgo/cmd"
+import "github.com/chlowell/azure-sdk-tools/src/go/apiviewgo/cmd"
 
 func main() {
 	cmd.Execute()
